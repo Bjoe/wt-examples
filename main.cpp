@@ -1,102 +1,51 @@
-/*
- * Copyright (C) 2008 Emweb bvba, Heverlee, Belgium.
- *
- * See the LICENSE file for terms of use.
- */
-
 #include <Wt/WApplication.h>
-#include <Wt/WBreak.h>
-#include <Wt/WContainerWidget.h>
-#include <Wt/WLineEdit.h>
-#include <Wt/WPushButton.h>
-#include <Wt/WText.h>
+#include <Wt/WServer.h>
+#include <Wt/WWidget.h>
+#include <Wt/WBootstrapTheme.h>
 
-/*
- * A simple hello world application class which demonstrates how to react
- * to events, read input, and give feed-back.
- */
-class HelloApplication : public Wt::WApplication
+#include <memory>
+
+#include "mainmenu.h"
+
+std::unique_ptr<Wt::WApplication> createApplication(const Wt::WEnvironment& env)
 {
-public:
-  HelloApplication(const Wt::WEnvironment& env);
+    auto app = std::make_unique<Wt::WApplication>(env);
 
-private:
-  Wt::WLineEdit *nameEdit_;
-  Wt::WText     *greeting_;
+    // Set bootstrap theme see http://getbootstrap.com/
+    std::shared_ptr<Wt::WBootstrapTheme> theme = std::make_shared<Wt::WBootstrapTheme>();
+    theme->setVersion(Wt::BootstrapVersion::v3);
+    app->setTheme(theme);
 
-  void greet();
-};
+    // load approot/template.xml
+    app->messageResourceBundle().use(app->appRoot() + "templates");
 
-/*
- * The env argument contains information about the new session, and
- * the initial request. It must be passed to the WApplication
- * constructor so it is typically also an argument for your custom
- * application constructor.
-*/
-HelloApplication::HelloApplication(const Wt::WEnvironment& env)
-  : WApplication(env)
-{
-  setTitle("Hello world");                            // application title
+    // load approot/strings.xml
+    // (or approot/strings_nl.xml)
+    app->messageResourceBundle().use(app->appRoot() + "strings");
 
-  root()->addWidget(Wt::cpp14::make_unique<Wt::WText>("Your name, please ? ")); // show some text
+    // add stylesheet
+    app->useStyleSheet("style.css");
 
-  nameEdit_ = root()->addWidget(Wt::cpp14::make_unique<Wt::WLineEdit>()); // allow text input
-  nameEdit_->setFocus();                              // give focus
+    app->setTitle("Hello EULA");
 
-  auto button = root()->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Greet me."));
-                                                      // create a button
-  button->setMargin(5, Wt::Side::Left);                   // add 5 pixels margin
+    example::MainMenu* mainMenu = app->root()->addWidget(std::make_unique<example::MainMenu>());
 
-  root()->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());    // insert a line break
-  greeting_ = root()->addWidget(Wt::cpp14::make_unique<Wt::WText>()); // empty text
+    app->internalPathChanged().connect(mainMenu, &example::MainMenu::handlePathChange);
 
-  /*
-   * Connect signals with slots
-   *
-   * - simple Wt-way: specify object and method
-   */
-  button->clicked().connect(this, &HelloApplication::greet);
-
-  /*
-   * - using an arbitrary function object, e.g. useful to bind
-   *   values with std::bind() to the resulting method call
-   */
-  nameEdit_->enterPressed().connect(std::bind(&HelloApplication::greet, this));
-
-  /*
-   * - using a lambda:
-   */
-  button->clicked().connect([=]() {
-      std::cerr << "Hello there, " << nameEdit_->text() << std::endl;
-  });
-}
-
-void HelloApplication::greet()
-{
-  /*
-   * Update the text, using text input into the nameEdit_ field.
-   */
-  greeting_->setText("Hello there, " + nameEdit_->text());
+    return app;
 }
 
 int main(int argc, char **argv)
 {
-  /*
-   * Your main method may set up some shared resources, but should then
-   * start the server application (FastCGI or httpd) that starts listening
-   * for requests, and handles all of the application life cycles.
-   *
-   * The last argument to WRun specifies the function that will instantiate
-   * new application objects. That function is executed when a new user surfs
-   * to the Wt application, and after the library has negotiated browser
-   * support. The function should return a newly instantiated application
-   * object.
-   */
-  return Wt::WRun(argc, argv, [](const Wt::WEnvironment &env) {
-    /*
-     * You could read information from the environment to decide whether
-     * the user has permission to start a new application
-     */
-    return Wt::cpp14::make_unique<HelloApplication>(env);
-  });
-}
+    try {
+      Wt::WServer server(argc, argv, WTHTTP_CONFIGURATION);
+
+      server.addEntryPoint(Wt::EntryPointType::Application, createApplication);
+
+      server.run();
+    } catch (Wt::WServer::Exception& e) {
+      std::cerr << e.what() << std::endl;
+    } catch (std::exception &e) {
+      std::cerr << "exception: " << e.what() << std::endl;
+    }
+  }

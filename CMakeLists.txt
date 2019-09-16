@@ -12,7 +12,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Set wt_DIR:PATH=/..../Development/wt/usr/lib/cmake/wt
 find_package(wt CONFIG REQUIRED)
 
-add_executable(wtex main.cpp)
+add_executable(wtex main.cpp mainmenu.cpp registration.cpp userformview.cpp userformmodel.cpp eula.cpp)
+
 target_link_libraries(wtex PUBLIC
   Wt::Wt
   Wt::HTTP

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages>
+    <message id="str.eula">Eula in deutsch.....</message>
+    <message id="str.eula_decline">Tut mir leid, du musst schon die EULA akzeptieren.</message>
+    <message id="btn.accept">Akzeptieren</message>
+    <message id="btn.decline">Nicht akzeptieren</message>
+</messages>
