@@ -74,4 +74,6 @@ Thumbs.db
 
 build/src-wt
 build/usr-wt
+build/ide-build
+build/sdk/qtcreator
 usr

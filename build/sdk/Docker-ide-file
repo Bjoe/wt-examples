@@ -1,0 +1,27 @@
+ARG dockerimage
+
+FROM $dockerimage
+LABEL maintainer="Joerg-Christian Boehme <joerg@chaosdorf.de>"
+
+USER 0:0
+RUN \
+  apt-get update && \
+  DEBIAN_FRONTEND="noninteractive" apt-get -y upgrade && \
+  DEBIAN_FRONTEND="noninteractive" \
+  apt-get -y install \
+  # Install Qt-Creator
+  # qtcreator <- To much dependencies ...
+  # To start QtCreator inside the docker
+  libfreetype6 libfontconfig1 libxi6 libxkbcommon-x11-0 libxrender1 libdbus-1-dev \ 
+  #libglvnd-dev
+  # Need some GL driver .... from mesa or something else ...
+  # libnvidia-gl-390:amd64
+  libgl1-mesa-dri libgl1:amd64 \
+  # Some tools
+  tmux less vim lnav \
+  # For debugging, need a ternminal emulator
+  xterm \
+  && \
+  apt-get -q autoremove && apt-get -q clean && rm -rf /var/lib/apt/lists/* &&  rm -f /var/cache/apt/*.bin
+
+USER 1000:1000

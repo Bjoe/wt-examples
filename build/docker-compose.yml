@@ -34,3 +34,38 @@ services:
       - bash
       - /sdk/env.sh
       - execute-example.sh
+
+  run-dev-ide:
+    build:
+      context: .
+      dockerfile: sdk/Docker-ide-file
+      args:
+        dockerimage: bojoe/wt-build-env-ubuntu:latest
+    container_name: dev-wt-ide
+    network_mode: "host"
+    privileged: true
+    user: 0:0
+    security_opt:
+      - seccomp=unconfined
+    cap_add:
+      - SYS_PTRACE
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - GROUP_ID=${GROUP_ID}
+      - USER_ID=${USER_ID}
+      - SSH_AUTH_SOCK=$SSH_AUTH_SOCK
+      - DISPLAY=$DISPLAY
+      - wt_DIR=/usr-wt/lib/cmake/wt
+    volumes:
+      - ./usr-wt:/usr-wt
+      - ./sdk:/sdk
+      - ..:/source
+      - ./ide-build:/build
+      - $HOME:/home/developer
+      - $HOME:/home/$USER
+      - /tmp:/tmp
+    entrypoint: 
+      - bash
+      - /sdk/env.sh
+      - execute-ide.sh
