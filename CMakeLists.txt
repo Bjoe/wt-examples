@@ -19,3 +19,5 @@ target_link_libraries(wtex PUBLIC
   Wt::Dbo
   Wt::DboSqlite3)
 target_compile_features(wtex PUBLIC cxx_std_17)
+
+install(TARGETS wtex RUNTIME DESTINATION bin)

@@ -1,0 +1,36 @@
+version: "3.6"
+
+services:
+  build-wt:
+    image: bojoe/wt-build-env-ubuntu:latest
+    user: 0:0
+    environment:
+      - GROUP_ID=${GROUP_ID}
+      - USER_ID=${USER_ID}
+      - SRC_DIR=/src-wt
+      - wt_DIR=/usr-wt
+    volumes: 
+    - ./usr-wt:/usr-wt
+    - ./src-wt:/src-wt
+    - ./sdk:/sdk
+    entrypoint:
+      - bash 
+      - /sdk/env.sh
+      - execute-wt-build.sh
+
+  run-example:
+    image: bojoe/wt-build-env-ubuntu:latest
+    user: 0:0
+    environment:
+      - GROUP_ID=${GROUP_ID}
+      - USER_ID=${USER_ID}
+      - wt_DIR=/usr-wt/lib/cmake/wt
+      - INSTALL_DIR=/source/usr
+    volumes: 
+      - ./usr-wt:/usr-wt
+      - ./sdk:/sdk
+      - ..:/source
+    entrypoint: 
+      - bash
+      - /sdk/env.sh
+      - execute-example.sh
