@@ -10,10 +10,6 @@ class Eula : public Wt::WContainerWidget
 {
 public:
     Eula();
-
-private:
-    Wt::WText* state_ = {};
-
 };
 
 } // namespace example

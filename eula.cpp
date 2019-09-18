@@ -1,6 +1,8 @@
 #include "eula.h"
 
 #include <Wt/WPushButton.h>
+#include <Wt/WMessageBox.h>
+#include <Wt/WFlags.h>
 #include <Wt/WLink.h>
 #include <Wt/WBreak.h>
 
@@ -17,10 +19,9 @@ Eula::Eula()
     acceptButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/reg"));
 
     addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    state_ = addWidget(Wt::cpp14::make_unique<Wt::WText>());
 
     declineButton->clicked().connect([=]() {
-      state_->setText(tr("str.eula_decline"));
+      Wt::WMessageBox::show("EULA", tr("str.eula_decline"), Wt::StandardButton::Ok);
     });
 
 }
